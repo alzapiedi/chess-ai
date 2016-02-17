@@ -5,7 +5,7 @@ var Display = function ($el) {
   this.$el = $el;
   this.board = new Board();
   this.board.populate();
-  this.info("White's turn");
+  this.info("Your turn");
 }
 
 Display.prototype.setupGrid = function () {
