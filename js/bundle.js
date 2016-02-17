@@ -101,8 +101,8 @@
 	  if (this.board.checkmate(this.turn)) {
 	    this.gameOver();
 	  } else {
-	    var info = this.turn === "white" ? "White's turn" : "Black's turn (thinking..)";
-	    if (this.board.inCheck(this.turn)) {
+	    var info = this.turn === "white" ? "Your turn" : "Computer's turn"; 
+	    if (this.turn === "white" && this.board.inCheck(this.turn)) {
 	      info += " (CHECK)";
 	    }
 	    this.display.info(info);
