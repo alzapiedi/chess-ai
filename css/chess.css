@@ -1,0 +1,150 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+}
+
+button {
+  width: 140px;
+  margin: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  background: #ccc;
+}
+
+#errors, #info {
+  display: block;
+  width: 500px;
+  height: 50px;
+  margin: auto;
+  margin-top: 10px;
+  color: red;
+  font-family: Helvetica;
+  font-size: 36px;
+  text-align: center;
+}
+
+#info {
+  color: black;
+  margin: 10px auto;
+  height: 50px;
+}
+
+#buttons {
+  margin: auto;
+  width: 140px;
+}
+
+#game {
+  width: 480px;
+  height: 480px;
+  margin: auto;
+}
+
+.group:after {
+  content: "";
+  clear: both;
+  display: block;
+}
+
+.chess-grid {
+  width: 480px;
+  height: 480px;
+  display: block;
+}
+
+.square {
+  height: 60px;
+  width: 60px;
+  float: left;
+  cursor: pointer;
+}
+
+.square:hover {
+  opacity: 0.75;
+}
+
+.white {
+  background: #DEB887
+}
+
+.black {
+  background: #8B4513;
+}
+
+.piece:after {
+  font-size: 36px;
+  left: 12px;
+  top: 3px;
+  position: relative;
+}
+
+.pawn-white:after {
+  content: "♟";
+  color: white;
+}
+
+.pawn-black:after {
+  content: "♟";
+  color: black;
+
+}
+
+.bishop-white:after {
+  content: "♝";
+  color: white;
+
+}
+
+.bishop-black:after {
+  content: "♝";
+  color: black;
+}
+
+.knight-white:after {
+  content: "♞";
+  color: white;
+}
+
+.knight-black:after {
+  content: "♞";
+  color: black;
+}
+
+.rook-black:after {
+  content: "♜";
+  color: black;
+}
+
+.rook-white:after {
+  content: "♜";
+  color: white;
+}
+
+.queen-white:after {
+  content: "♛";
+  color: white;
+}
+
+.queen-black:after {
+  content: "♛";
+  color: black;
+}
+
+.king-white:after {
+  content: "♚";
+  color: white;
+}
+
+.king-black:after {
+  content: "♚";
+  color: black;
+}
+
+
+.selected {
+  background: green;
+}
