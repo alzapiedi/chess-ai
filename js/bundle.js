@@ -886,8 +886,8 @@
 	      depth = 5;
 	    }
 	  }
-	  // this.buildMoveTree(this.moveTree, depth);
-	  this.alphaBeta(this.moveTree, depth, -11000, 11000, false);
+	  this.buildMoveTree(this.moveTree, depth);
+	  // this.alphaBeta(this.moveTree, depth, -11000, 11000, false);
 	  var best = this.findBestMove();
 	  delete this.bestNode;
 	  return best;
@@ -921,32 +921,33 @@
 	    childNode = boardNode.addChild(testboard, nextColor, move);
 	
 	///////////// BRUTE FORCE GAME TREE ///////////////
-	    // this.buildMoveTree(childNode, depth - 1);
-	    // this.assignNodeValue(childNode);
+	    this.buildMoveTree(childNode, depth - 1);
+	    this.assignNodeValue(childNode);
 	///////////////////////////////////////////////////
 	
-	    if (depth === 1) {
-	      childNode.boardValue = childNode.score();
-	    }
-	
-	    if (nextColor === "white" && childNode.boardValue < boardNode.b) {
-	      boardNode.b = childNode.boardValue;
-	      boardNode.boardValue = boardNode.b;
-	    } else if (nextColor === "black" && childNode.boardValue > boardNode.a) {
-	      boardNode.a = childNode.boardValue;
-	      boardNode.boardValue = boardNode.a;
-	    }
-	
-	    if (childNode.boardValue >= boardNode.a && childNode.boardValue <= boardNode.b) {
-	      this.buildMoveTree(childNode, depth - 1);
-	    } else {
-	      continue;
-	    }
-	  }
-	  if (boardNode.currentTurn === "black") {
-	    boardNode.parent && (boardNode.parent.a = boardNode.b);
-	  } else {
-	    boardNode.parent && (boardNode.parent.b = boardNode.a);
+	  //   if (depth === 1) {
+	  //     childNode.boardValue = childNode.score();
+	  //   }
+	  //
+	  //   if (nextColor === "white" && childNode.boardValue < boardNode.b) {
+	  //     boardNode.b = childNode.boardValue;
+	  //     boardNode.boardValue = boardNode.b;
+	  //   } else if (nextColor === "black" && childNode.boardValue > boardNode.a) {
+	  //     boardNode.a = childNode.boardValue;
+	  //     boardNode.boardValue = boardNode.a;
+	  //   }
+	  //
+	  //   if (childNode.boardValue >= boardNode.a && childNode.boardValue <= boardNode.b) {
+	  //     this.buildMoveTree(childNode, depth - 1);
+	  //   } else {
+	  //     continue;
+	  //   }
+	  // }
+	  // if (boardNode.currentTurn === "black") {
+	  //   boardNode.parent && (boardNode.parent.a = boardNode.b);
+	  // } else {
+	  //   boardNode.parent && (boardNode.parent.b = boardNode.a);
+	  // }
 	  }
 	}
 	
