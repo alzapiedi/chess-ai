@@ -11,12 +11,14 @@ var AI = function (board, color) {
   this.color = color;
   this.enemyColor = this.color === "white" ? "black" : "white";
   this.moveNumber = 0;
+  this.iterations = 0;
 }
 
 AI.prototype.getMove = function () {
   this.moveNumber += 2;
+  this.iterations = 0;
   if (this.moveNumber < 5) { return this.getOpeningMove(); }
-  this.moveTree = new BoardNode(this.board, this.color, null);
+  this.moveTree = new BoardNode(this.board, this.color, null, -11000, 11000, 11000);
   this.currentTurn = this.color;
   var depth = 3;
   var totalMoves = this.getAllMoves(this.board.pieces(this.color));
@@ -29,7 +31,8 @@ AI.prototype.getMove = function () {
       depth = 5;
     }
   }
-  this.buildMoveTree(this.moveTree, depth);
+  // this.buildMoveTree(this.moveTree, depth);
+  this.alphaBeta(this.moveTree, depth, -11000, 11000, false);
   var best = this.findBestMove();
   delete this.bestNode;
   return best;
@@ -49,6 +52,7 @@ AI.prototype.getOpeningMove = function () {
 }
 
 AI.prototype.buildMoveTree = function (boardNode, depth) {
+  this.iterations += 1;
   if (depth === 0) { return; }
   var curColor = boardNode.currentTurn;
   var nextColor = curColor === "white" ? "black" : "white";
@@ -60,8 +64,71 @@ AI.prototype.buildMoveTree = function (boardNode, depth) {
     testboard.depth = depth;
     testboard.move(move.startPos, move.endPos);
     childNode = boardNode.addChild(testboard, nextColor, move);
-    this.buildMoveTree(childNode, depth - 1);
-    this.assignNodeValue(childNode);
+
+///////////// BRUTE FORCE GAME TREE ///////////////
+    // this.buildMoveTree(childNode, depth - 1);
+    // this.assignNodeValue(childNode);
+///////////////////////////////////////////////////
+
+    if (depth === 1) {
+      childNode.boardValue = childNode.score();
+    }
+
+    if (nextColor === "white" && childNode.boardValue < boardNode.b) {
+      boardNode.b = childNode.boardValue;
+      boardNode.boardValue = boardNode.b;
+    } else if (nextColor === "black" && childNode.boardValue > boardNode.a) {
+      boardNode.a = childNode.boardValue;
+      boardNode.boardValue = boardNode.a;
+    }
+
+    if (childNode.boardValue >= boardNode.a && childNode.boardValue <= boardNode.b) {
+      this.buildMoveTree(childNode, depth - 1);
+    } else {
+      continue;
+    }
+  }
+  if (boardNode.currentTurn === "black") {
+    boardNode.parent && (boardNode.parent.a = boardNode.b);
+  } else {
+    boardNode.parent && (boardNode.parent.b = boardNode.a);
+  }
+}
+
+AI.prototype.alphaBeta = function (node, depth, a, b, max) {
+  this.iterations += 1;
+  if (depth === 0) {
+    node.boardValue = node.score();
+    return node.boardValue;
+  }
+  if (max) {
+    var val = -11000;
+    var child;
+    var children = node.generateChildren();
+    for (var i = 0; i < children.length; i++) {
+      child = children[i];
+      node.boardValue = Math.max(val, this.alphaBeta(child, depth - 1, node.a, node.b, false));
+      node.a = Math.max(node.a, child.boardValue);
+      if (node.a > node.b) {
+        break;
+      }
+    }
+    node.parent && (node.parent.b = node.a);
+    return node.boardValue;
+  } else {
+    var val = 11000;
+    var child;
+    var children = node.generateChildren();
+    for (var i = 0; i < children.length; i++) {
+      child = children[i];
+      child.boardValue = Math.min(val, this.alphaBeta(child, depth - 1, node.a, node.b, true));
+      node.b = Math.min(node.b, child.boardValue);
+      if (node.a > node.b) {
+        break;
+      }
+    }
+    node.parent && (node.parent.a = node.b);
+    return node.boardValue;
   }
 }
 
@@ -75,6 +142,8 @@ AI.prototype.assignNodeValue = function (node) {
     } else {
       node.boardValue = Math.min.apply(null, childValues);
     }
+  } else {
+    node.boardValue = node.score();
   }
 }
 
@@ -83,6 +152,7 @@ AI.prototype.switchTurns = function () {
 }
 
 AI.prototype.findBestMove = function () {
+  console.log(this.iterations);
   var c = this.moveTree.children;
   var bestNode;
   for (var j = 0; j < c.length; j++) {

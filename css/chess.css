@@ -12,7 +12,12 @@ button {
   font-size: 14px;
   border: 1px solid #eee;
   border-radius: 3px;
-  background: #ccc;
+  background: green;
+  cursor: pointer;
+}
+
+body {
+  background: #ddd;
 }
 
 #errors, #info {
@@ -42,6 +47,58 @@ button {
   width: 480px;
   height: 480px;
   margin: auto;
+  border: 5px solid #eee;
+  border-style: ridge;
+}
+
+#welcome {
+  width: 480px;
+  margin: auto;
+}
+
+#welcome p {
+  font-family: Helvetica;
+  font-size: 16px;
+  text-align: center;
+}
+
+.header {
+  display: block;
+  background: #ccc;
+}
+
+.header-links {
+  display: block;
+  width: 480px;
+  margin: auto;
+}
+
+.group:after {
+  clear:both;
+  display:block;
+  content:"";
+}
+
+.link {
+  float: left;
+  width: 160px;
+  text-align: center;
+  font-family: Helvetica;
+}
+
+.left {
+  text-align: left;
+}
+
+.right {
+  text-align: right;
+}
+
+.port-link {
+  padding: 24px 0;
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .group:after {
@@ -148,3 +205,7 @@ button {
 .selected {
   background: green;
 }
+
+/** {
+  border: 1px solid black;
+}*/
