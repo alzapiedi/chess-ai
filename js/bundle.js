@@ -872,19 +872,20 @@
 	
 	AI.prototype.setDepth = function () {
 	  var cap = this.capturablePieces();
-	  if (cap.length === 0) {
-	    this.depth = 3;
-	  } else {
-	    var allPawns = true;
-	    for (var i = 0; i < cap.length; i++) {
-	      if (cap[i].toString() !== "pawn") {
-	        allPawns = false;
-	      }
-	    }
-	    this.depth = allPawns ? 3 : 4;
-	  }
 	  var moves = this.moveTree.getAllMoves(this.board.pieces(this.color));
-	  if (moves.length >= 30) { this.depth = 3; }
+	  if (moves.length < 30) {
+	    if (cap.length === 0) {
+	      this.depth = 3;
+	    } else {
+	      var allPawns = true;
+	      for (var i = 0; i < cap.length; i++) {
+	        if (cap[i].toString() !== "pawn") {
+	          allPawns = false;
+	        }
+	      }
+	      this.depth = allPawns ? 3 : 4;
+	    }
+	  } else { this.depth = 3; }
 	  console.log("Depth: " + this.depth + "  Moves: " + moves.length);
 	}
 	
