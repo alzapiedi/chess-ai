@@ -31,7 +31,7 @@ Board.prototype.setPiece = function (piece) {
 }
 
 Board.prototype.isOccupied = function (pos) {
-  if (!this.inBounds) { return false; }
+  if (!this.inBounds(pos)) { return false; }
   return !(this.grid[pos[0]][pos[1]] === null);
 }
 

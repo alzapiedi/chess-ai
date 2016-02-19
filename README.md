@@ -1,6 +1,3 @@
 # Chess AI
 This is a JavaScript chess implementation that renders the board and pieces using jQuery and CSS.
-The AI player recursively builds a move tree to a specified depth and applies the minimax algorithm
-to find the optimal path. A leaf board state is valued by the sum of all its pieces and then passed back
-up to the parent node.  The depth is currently set to 3, with a branching factor of ~35 this tree consists
-of approximately 40,000 nodes and the AI returns its move in a maximum of 15 seconds.
+The AI player recursively builds ands prunes a move tree to a specified depth using the minimax decision algorithm and Alpha-beta pruning algorithm.  At each node the children are generated and sorted by value of pieces captured. This is to increase the probability that a good move is found early in the depth first search, which allows the pruning algorithm to ignore the greatest amount of branches.  A leaf board state is valued by the sum of all its pieces and then passed back up to the parent node where the alpha, beta and node value will be updated if necessary.

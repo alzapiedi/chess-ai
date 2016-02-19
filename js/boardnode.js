@@ -24,10 +24,12 @@ BoardNode.prototype.score = function () {
   return whiteScore - blackScore;
 }
 
-BoardNode.prototype.addChild = function (board, color, move) {
-  var bv = color === "white" ? this.b : this.a
+BoardNode.prototype.addChild = function (board, color, move, order) {
+  window.g.cpuPlayer.totalGenerated += 1;
+  var bv = color === "white" ? this.b : this.a;
   var childNode = new BoardNode(board, color, this, this.a, this.b, bv);
   childNode.move = move;
+  childNode.order = order;
   this.children.push(childNode);
   return childNode;
 }
@@ -40,9 +42,16 @@ BoardNode.prototype.generateChildren = function () {
   for (var i = 0; i < moves.length; i++) {
     move = moves[i];
     testboard = this.board.clone();
+    var order = 0;
+    if (testboard.isOccupied(move.endPos)) {
+      order = testboard.piece(move.endPos).value;
+    }
     testboard.move(move.startPos, move.endPos);
-    childNode = this.addChild(testboard, nextColor, move);
+    childNode = this.addChild(testboard, nextColor, move, order);
   }
+  this.children.sort(function (a, b) {
+    return b.order - a.order;
+  });
   return this.children;
 }
 
