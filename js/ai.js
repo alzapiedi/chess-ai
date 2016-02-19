@@ -29,7 +29,7 @@ AI.prototype.setDepth = function () {
     this.depth = allPawns ? 3 : 4;
   }
   var moves = this.moveTree.getAllMoves(this.board.pieces(this.color));
-  if (moves.length > 35) { this.depth = 3; }
+  if (moves.length >= 30) { this.depth = 3; }
   console.log("Depth: " + this.depth + "  Moves: " + moves.length);
 }
 
