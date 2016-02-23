@@ -55,13 +55,14 @@ Game.prototype.switchTurns = function () {
   if (this.board.checkmate(this.turn)) {
     this.gameOver();
   } else {
-    var info = this.turn === "white" ? "Your turn" : "Computer's turn"; 
+    var info = this.turn === "white" ? "Your turn" : "Computer's turn";
     if (this.turn === "white" && this.board.inCheck(this.turn)) {
       info += " (CHECK)";
     }
     this.display.info(info);
     var cpuMove
     if (this.turn === "black") {
+      this.display.clearListener();
       this.display.unselect();
       this.display.render();
       setTimeout(function () {
