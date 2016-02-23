@@ -33,11 +33,11 @@ AI.prototype.setDepth = function () {  // Still breaks occasionally at depth 4, 
 AI.prototype.getMove = function () {
   this.moveNumber += 2;
   if (this.moveNumber < 5) { return this.getOpeningMove(); }
-  this.moveTree = new BoardNode(this.board, this.color, null, -11000, 11000, 11000);
+  this.moveTree = new BoardNode(this.board, this.color, null, -500, 500, 500);
   this.moveTree.boardValue = this.moveTree.score();
   // this.setDepth();  // Needs to be 3 to guarantee no crashes
   this.depth = 3;
-  this.alphaBeta(this.moveTree, this.depth, -11000, 11000, false);
+  this.alphaBeta(this.moveTree, this.depth, -500, 500, false);
   var best = this.findBestMove();
   delete this.bestNode;
   return best;
@@ -64,7 +64,7 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic
     return node.boardValue;
   }
   if (max) {
-    node.boardValue = -11000;
+    node.boardValue = -500;
     var child;
     var children = node.generateChildren();
     for (var i = 0; i < children.length; i++) {
@@ -78,7 +78,7 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic
     node.parent && (node.parent.b = Math.min(node.parent.b, node.a));
     return node.boardValue;
   } else {
-    node.boardValue = 11000;
+    node.boardValue = 500;
     var child;
     var children = node.generateChildren();
     for (var i = 0; i < children.length; i++) {
