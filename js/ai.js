@@ -3,7 +3,6 @@ var BoardNode = require('./boardnode'),
 
 // Problems:
 // 1. With queen in danger prefers to put you in check than move it.
-// 2. Takes too long
 
 
 var AI = function (board, color) {
@@ -11,11 +10,9 @@ var AI = function (board, color) {
   this.color = color;
   this.enemyColor = this.color === "white" ? "black" : "white";
   this.moveNumber = 0;
-  this.iterations = 0;
-  this.totalGenerated = 0;
 }
 
-AI.prototype.setDepth = function () {
+AI.prototype.setDepth = function () {  // Still breaks occasionally at depth 4, sticking with 3 for now
   var cap = this.capturablePieces();
   var moves = this.moveTree.getAllMoves(this.board.pieces(this.color));
   if (moves.length < 30) {
@@ -31,24 +28,22 @@ AI.prototype.setDepth = function () {
       this.depth = allPawns ? 3 : 4;
     }
   } else { this.depth = 3; }
-  console.log("Depth: " + this.depth + "  Moves: " + moves.length);
 }
 
 AI.prototype.getMove = function () {
   this.moveNumber += 2;
-  this.iterations = 0;
-  this.pruned = 0;
   if (this.moveNumber < 5) { return this.getOpeningMove(); }
   this.moveTree = new BoardNode(this.board, this.color, null, -11000, 11000, 11000);
   this.moveTree.boardValue = this.moveTree.score();
-  this.setDepth();
+  // this.setDepth();  // Needs to be 3 to guarantee no crashes
+  this.depth = 3;
   this.alphaBeta(this.moveTree, this.depth, -11000, 11000, false);
   var best = this.findBestMove();
   delete this.bestNode;
   return best;
 }
 
-AI.prototype.getOpeningMove = function () {
+AI.prototype.getOpeningMove = function () {  // Hard coded 2 opening moves
   if (this.moveNumber === 2) {
     return [[1,4],[2,4]];
   }
@@ -61,10 +56,9 @@ AI.prototype.getOpeningMove = function () {
   }
 }
 
-AI.prototype.alphaBeta = function (node, depth, a, b, max) {
+AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic happens
   node.a = a;
   node.b = b;
-  this.iterations += 1;
   if (depth === 0) {
     node.boardValue = node.score();
     return node.boardValue;
@@ -78,7 +72,6 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {
       node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, false));
       node.a = Math.max(node.a, child.boardValue);
       if (node.a > node.b) {
-        this.pruned +=1;
         break;
        }
     }
@@ -93,7 +86,6 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {
       node.boardValue = Math.min(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, true));
       node.b = Math.min(node.b, child.boardValue);
       if (node.a > node.b) {
-        this.pruned +=1;
         break;
       }
     }
@@ -102,11 +94,14 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {
   }
 }
 
-AI.prototype.findBestMove = function () {
-  var c = this.moveTree.children;
-  var bestNode;
+AI.prototype.findBestMove = function () {  // Examines next possible moves from tree
+  var c = this.moveTree.children;           // chooses the one with the min value
+  var bestNode, node, piece, move;
   for (var j = 0; j < c.length; j++) {
-    if (!bestNode || c[j].boardValue < bestNode.boardValue) {
+    node = c[j];
+    piece = this.board.piece(node.move.startPos);
+    move = node.move.endPos;
+    if ((!bestNode || c[j].boardValue < bestNode.boardValue) && piece.validMove(move)) {
       bestNode = c[j];
     }
   }

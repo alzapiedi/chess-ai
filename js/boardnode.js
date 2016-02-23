@@ -25,7 +25,6 @@ BoardNode.prototype.score = function () {
 }
 
 BoardNode.prototype.addChild = function (board, color, move, order) {
-  window.g.cpuPlayer.totalGenerated += 1;
   var bv = color === "white" ? this.b : this.a;
   var childNode = new BoardNode(board, color, this, this.a, this.b, bv);
   childNode.move = move;
@@ -34,8 +33,8 @@ BoardNode.prototype.addChild = function (board, color, move, order) {
   return childNode;
 }
 
-BoardNode.prototype.generateChildren = function () {
-  var curColor = this.currentTurn;
+BoardNode.prototype.generateChildren = function () {  // For a given board node, generates and returns
+  var curColor = this.currentTurn;                       // a child node for every possible move
   var nextColor = curColor === "white" ? "black" : "white";
   var moves = this.getAllMoves(this.board.pieces(curColor));
   var testboard, move, childNode;
