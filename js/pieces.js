@@ -190,7 +190,7 @@ var Queen = function (attrs) {
     this.board.blackPieces.push(this);
   }
   this.pos = attrs.pos;
-  this.value = 90;
+  this.value = 80;
   this.moves = Sliding.moves.bind(this);
   this.board.setPiece(this);
 }
@@ -214,7 +214,7 @@ var King = function (attrs) {
   this.moves = Stepping.moves.bind(this);
   this.board.setPiece(this);
   this.moved = false;
-  this.value = 10000;
+  this.value = 100;
 }
 Utils.inherits(King, Piece);
 King.prototype.getMoveDirs = function () {

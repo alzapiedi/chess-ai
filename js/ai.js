@@ -2,7 +2,7 @@ var BoardNode = require('./boardnode'),
     Utils = require('./utils');
 
 // Problems:
-// 1. With queen in danger prefers to put you in check than move it.
+// 1. With queen in danger prefers to put you in check than move it.a
 
 
 var AI = function (board, color) {
