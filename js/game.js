@@ -60,17 +60,14 @@ Game.prototype.switchTurns = function () {
       info += " (CHECK)";
     }
     this.display.info(info);
-    var cpuMove
     if (this.turn === "black") {
       this.display.clearListener();
       this.display.unselect();
       this.display.render();
-      setTimeout(function () {
-        cpuMove = this.cpuPlayer.getMove();
-        this.board.move(cpuMove[0], cpuMove[1]);
-        this.switchTurns();
-        this.display.render();
-      }.bind(this), 500);
+      var cpuMove = this.cpuPlayer.getMove();
+      this.board.move(cpuMove[0], cpuMove[1]);
+      this.switchTurns();
+      this.display.render();
     }
   }
 }
