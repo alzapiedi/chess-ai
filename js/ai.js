@@ -36,7 +36,7 @@ AI.prototype.getMove = function () {
   this.moveTree = new BoardNode(this.board, this.color, null, -500, 500, 500);
   this.moveTree.boardValue = this.moveTree.score();
   // this.setDepth();  // Needs to be 3 to guarantee no crashes
-  this.depth = 3;
+  this.depth = 1;
   this.alphaBeta(this.moveTree, this.depth, -500, 500, false);
   var best = this.findBestMove();
   delete this.bestNode;

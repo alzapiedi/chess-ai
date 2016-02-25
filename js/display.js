@@ -39,6 +39,20 @@ Display.prototype.unselect = function () {
   });
 }
 
+Display.prototype.outline = function (pos) {
+  $('li').each(function (i, el) {
+    if (Utils.arrayEquals($(el).data("pos"), pos)) {
+      $(el).addClass("outlined");
+    }
+  });
+}
+
+Display.prototype.removeOutline = function () {
+  $('li').each(function (i, el) {
+    $(el).removeClass("outlined");
+  });
+}
+
 Display.prototype.render = function () {
   var pos, square;
   var pieces = this.board.pieces();

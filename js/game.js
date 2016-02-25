@@ -51,7 +51,6 @@ Game.prototype.setStart = function (pos) {
 }
 
 Game.prototype.switchTurns = function () {
-  this.display.render();
   this.turn = this.turn === "white" ? "black" : "white";
   if (this.board.checkmate(this.turn)) {
     this.gameOver();
@@ -64,10 +63,14 @@ Game.prototype.switchTurns = function () {
     if (this.turn === "black") {
       this.display.clearListener();
       this.display.unselect();
+      this.display.removeOutline();
       this.display.render();
       setTimeout(function () {
         var cpuMove = this.cpuPlayer.getMove();
         this.board.move(cpuMove[0], cpuMove[1]);
+        this.display.render();
+        this.display.outline(cpuMove[0]);
+        this.display.outline(cpuMove[1]);
         this.states.push(this.board.clone());
         this.switchTurns();
       }.bind(this), 50);
@@ -79,7 +82,11 @@ Game.prototype.switchTurns = function () {
 
 Game.prototype.gameOver = function () {
   var winner = this.turn === "white" ? "Black" : "White";
-  this.display.info("Checkmate. " + winner + " wins!");
+  if (!this.board.inCheck(this.turn)) {
+    this.display.info("Stalemate.");
+  } else {
+    this.display.info("Checkmate. " + winner + " wins!");
+  }
 }
 
 Game.prototype.chooseEnd = function () {

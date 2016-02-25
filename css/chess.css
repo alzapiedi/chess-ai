@@ -3,6 +3,7 @@
   padding: 0;
   border: 0;
   list-style: none;
+  box-sizing: border-box;
 }
 
 button {
@@ -204,6 +205,10 @@ body {
 
 .selected {
   background: green;
+}
+
+.outlined {
+  border: 2px solid green;
 }
 
 /** {
