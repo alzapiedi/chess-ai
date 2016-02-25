@@ -121,6 +121,13 @@ Board.prototype.move = function (startPos, endPos) {
   if (piece.toString() === "pawn" && Math.abs(endPos[0] - startPos[0]) === 2) {
     piece.setPassant();
   }
+  var pawnPromoteRank = piece.color === "white" ? 0 : 7;
+  if (piece.toString() === "pawn" && piece.pos[0] === pawnPromoteRank) {
+    var pos = piece.pos;
+    var color = piece.color;
+    this.removePiece(piece);
+    new Pieces.Queen({color: color, pos: pos, board: this});
+  }
 }
 
 Board.prototype.inBounds = function (pos) {
