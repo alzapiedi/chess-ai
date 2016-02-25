@@ -87,6 +87,7 @@ Game.prototype.gameOver = function () {
   } else {
     this.display.info("Checkmate. " + winner + " wins!");
   }
+  this.display.render();
 }
 
 Game.prototype.chooseEnd = function () {
