@@ -165,6 +165,7 @@
 	    this.cpuPlayer.moveNumber -= 2;
 	    this.board = this.states[this.states.length - 1].clone();
 	    this.turn = "white";
+	    this.cpuPlayer.board = this.board;
 	    this.display.setBoard(this.board);
 	    this.display.render();
 	    this.chooseMove();
@@ -920,6 +921,7 @@
 	}
 	
 	AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic happens
+	  var searchDepth = depth;
 	  node.a = a;
 	  node.b = b;
 	  if (depth === 0) {
@@ -932,7 +934,11 @@
 	    var children = node.generateChildren();
 	    for (var i = 0; i < children.length; i++) {
 	      child = children[i];
-	      node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, false));
+	      if (child.isInCheck()) {
+	        node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth, node.a, node.b, false));
+	      } else {
+	        node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, false));
+	      }
 	      node.a = Math.max(node.a, child.boardValue);
 	      if (node.a > node.b) {
 	        break;
@@ -946,7 +952,11 @@
 	    var children = node.generateChildren();
 	    for (var i = 0; i < children.length; i++) {
 	      child = children[i];
-	      node.boardValue = Math.min(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, true));
+	      if (child.isInCheck()) {
+	        node.boardValue = Math.min(node.boardValue, this.alphaBeta(child, depth, node.a, node.b, true));
+	      } else {
+	        node.boardValue = Math.min(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, true));
+	      }
 	      node.b = Math.min(node.b, child.boardValue);
 	      if (node.a > node.b) {
 	        break;
@@ -1039,6 +1049,10 @@
 	  var whiteScore = Utils.arrayReduce(whiteScoreArr);
 	  var blackScore = Utils.arrayReduce(blackScoreArr);
 	  return whiteScore - blackScore;
+	}
+	
+	BoardNode.prototype.isInCheck = function () {
+	  return this.board.inCheck(this.currentTurn);
 	}
 	
 	BoardNode.prototype.addChild = function (board, color, move, order) {

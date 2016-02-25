@@ -24,6 +24,10 @@ BoardNode.prototype.score = function () {
   return whiteScore - blackScore;
 }
 
+BoardNode.prototype.isInCheck = function () {
+  return this.board.inCheck(this.currentTurn);
+}
+
 BoardNode.prototype.addChild = function (board, color, move, order) {
   var bv = color === "white" ? this.b : this.a;
   var childNode = new BoardNode(board, color, this, this.a, this.b, bv);

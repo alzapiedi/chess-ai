@@ -119,6 +119,7 @@ Game.prototype.undoMove = function () {
     this.cpuPlayer.moveNumber -= 2;
     this.board = this.states[this.states.length - 1].clone();
     this.turn = "white";
+    this.cpuPlayer.board = this.board;
     this.display.setBoard(this.board);
     this.display.render();
     this.chooseMove();

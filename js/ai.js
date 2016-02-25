@@ -57,6 +57,7 @@ AI.prototype.getOpeningMove = function () {  // Hard coded 2 opening moves
 }
 
 AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic happens
+  var searchDepth = depth;
   node.a = a;
   node.b = b;
   if (depth === 0) {
@@ -69,7 +70,11 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic
     var children = node.generateChildren();
     for (var i = 0; i < children.length; i++) {
       child = children[i];
-      node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, false));
+      if (child.isInCheck()) {
+        node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth, node.a, node.b, false));
+      } else {
+        node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, false));
+      }
       node.a = Math.max(node.a, child.boardValue);
       if (node.a > node.b) {
         break;
@@ -83,7 +88,11 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic
     var children = node.generateChildren();
     for (var i = 0; i < children.length; i++) {
       child = children[i];
-      node.boardValue = Math.min(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, true));
+      if (child.isInCheck()) {
+        node.boardValue = Math.min(node.boardValue, this.alphaBeta(child, depth, node.a, node.b, true));
+      } else {
+        node.boardValue = Math.min(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, true));
+      }
       node.b = Math.min(node.b, child.boardValue);
       if (node.a > node.b) {
         break;
