@@ -51,6 +51,7 @@ Game.prototype.setStart = function (pos) {
 }
 
 Game.prototype.switchTurns = function () {
+  this.display.render();
   this.turn = this.turn === "white" ? "black" : "white";
   if (this.board.checkmate(this.turn)) {
     this.gameOver();
@@ -64,10 +65,14 @@ Game.prototype.switchTurns = function () {
       this.display.clearListener();
       this.display.unselect();
       this.display.render();
-      var cpuMove = this.cpuPlayer.getMove();
-      this.board.move(cpuMove[0], cpuMove[1]);
-      this.switchTurns();
-      this.display.render();
+      setTimeout(function () {
+        var cpuMove = this.cpuPlayer.getMove();
+        this.board.move(cpuMove[0], cpuMove[1]);
+        this.states.push(this.board.clone());
+        this.switchTurns();
+      }.bind(this), 50);
+    } else {
+      this.chooseMove();
     }
   }
 }
@@ -90,7 +95,6 @@ Game.prototype.setEnd = function (pos) {
     board.move(this.startPos, pos);
     this.states.push(board.clone());
     this.switchTurns();
-    this.chooseMove();
   } else if (!this.board.inCheck(piece.color) && piece.moveIntoCheck(pos)) {
     this.display.flashError("Cannot move into check");
     this.display.unselect();
@@ -111,8 +115,10 @@ Game.prototype.undoMove = function () {
     this.display.flashError("No moves made");
   } else {
     this.states.pop();
+    this.states.pop();
+    this.cpuPlayer.moveNumber -= 2;
     this.board = this.states[this.states.length - 1].clone();
-    this.switchTurns();
+    this.turn = "white";
     this.display.setBoard(this.board);
     this.display.render();
     this.chooseMove();

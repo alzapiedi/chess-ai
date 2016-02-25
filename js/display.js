@@ -63,15 +63,16 @@ Display.prototype.selectPos = function (callback) {
 }
 
 Display.prototype.setListeners = function (game) {
-    this.newGameListener = $('#new-game').on('click', function () {
+  this.newGameListener = $('#new-game').on('click', function () {
     game.newGame();
+  });
+  this.undoListener = $('#undo-move').on('click', function () {
+    game.undoMove();
   });
 }
 
 Display.prototype.clearListener = function () {
   this.selectListener && this.selectListener.off('click');
-  this.undoListener && this.undoListener.off('click');
-  this.newGameListener && this.newGameListener.off('click');
 }
 
 Display.prototype.flashError = function (error) {

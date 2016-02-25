@@ -84,6 +84,7 @@ Board.prototype.removePiece = function (piece) {
     idx = this.blackPieces.indexOf(piece);
     this.blackPieces.splice(idx,1);
   }
+  this.grid[piece.pos[0]][piece.pos[1]] = null;
 }
 
 Board.prototype.move = function (startPos, endPos) {
@@ -93,10 +94,12 @@ Board.prototype.move = function (startPos, endPos) {
   if (piece.toString() === "pawn" && Math.abs(endPos[1] - startPos[1]) === 1 && !this.isOccupied(endPos)) {
     if (piece.color === "white") {
       var pos = [endPos[0] + 1, endPos[1]];
-      this.grid[pos[0]][pos[1]] = null;
+      var passantPawn = this.piece(pos);
+      this.removePiece(passantPawn);
     } else {
       var pos = [endPos[0] - 1, endPos[1]];
-      this.grid[pos[0]][pos[1]] = null;
+      var passantPawn = this.piece(pos);
+      this.removePiece(passantPawn);
     }
   }
   if (piece.toString() === "king" && endPos[1] - startPos[1] === 2) {

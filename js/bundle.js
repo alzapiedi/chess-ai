@@ -97,25 +97,28 @@
 	}
 	
 	Game.prototype.switchTurns = function () {
+	  this.display.render();
 	  this.turn = this.turn === "white" ? "black" : "white";
 	  if (this.board.checkmate(this.turn)) {
 	    this.gameOver();
 	  } else {
-	    var info = this.turn === "white" ? "Your turn" : "Computer's turn"; 
+	    var info = this.turn === "white" ? "Your turn" : "Computer's turn";
 	    if (this.turn === "white" && this.board.inCheck(this.turn)) {
 	      info += " (CHECK)";
 	    }
 	    this.display.info(info);
-	    var cpuMove
 	    if (this.turn === "black") {
+	      this.display.clearListener();
 	      this.display.unselect();
 	      this.display.render();
 	      setTimeout(function () {
-	        cpuMove = this.cpuPlayer.getMove();
+	        var cpuMove = this.cpuPlayer.getMove();
 	        this.board.move(cpuMove[0], cpuMove[1]);
+	        this.states.push(this.board.clone());
 	        this.switchTurns();
-	        this.display.render();
-	      }.bind(this), 500);
+	      }.bind(this), 50);
+	    } else {
+	      this.chooseMove();
 	    }
 	  }
 	}
@@ -138,7 +141,6 @@
 	    board.move(this.startPos, pos);
 	    this.states.push(board.clone());
 	    this.switchTurns();
-	    this.chooseMove();
 	  } else if (!this.board.inCheck(piece.color) && piece.moveIntoCheck(pos)) {
 	    this.display.flashError("Cannot move into check");
 	    this.display.unselect();
@@ -159,8 +161,10 @@
 	    this.display.flashError("No moves made");
 	  } else {
 	    this.states.pop();
+	    this.states.pop();
+	    this.cpuPlayer.moveNumber -= 2;
 	    this.board = this.states[this.states.length - 1].clone();
-	    this.switchTurns();
+	    this.turn = "white";
 	    this.display.setBoard(this.board);
 	    this.display.render();
 	    this.chooseMove();
@@ -252,15 +256,16 @@
 	}
 	
 	Display.prototype.setListeners = function (game) {
-	    this.newGameListener = $('#new-game').on('click', function () {
+	  this.newGameListener = $('#new-game').on('click', function () {
 	    game.newGame();
+	  });
+	  this.undoListener = $('#undo-move').on('click', function () {
+	    game.undoMove();
 	  });
 	}
 	
 	Display.prototype.clearListener = function () {
 	  this.selectListener && this.selectListener.off('click');
-	  this.undoListener && this.undoListener.off('click');
-	  this.newGameListener && this.newGameListener.off('click');
 	}
 	
 	Display.prototype.flashError = function (error) {
@@ -369,6 +374,7 @@
 	    idx = this.blackPieces.indexOf(piece);
 	    this.blackPieces.splice(idx,1);
 	  }
+	  this.grid[piece.pos[0]][piece.pos[1]] = null;
 	}
 	
 	Board.prototype.move = function (startPos, endPos) {
@@ -378,10 +384,12 @@
 	  if (piece.toString() === "pawn" && Math.abs(endPos[1] - startPos[1]) === 1 && !this.isOccupied(endPos)) {
 	    if (piece.color === "white") {
 	      var pos = [endPos[0] + 1, endPos[1]];
-	      this.grid[pos[0]][pos[1]] = null;
+	      var passantPawn = this.piece(pos);
+	      this.removePiece(passantPawn);
 	    } else {
 	      var pos = [endPos[0] - 1, endPos[1]];
-	      this.grid[pos[0]][pos[1]] = null;
+	      var passantPawn = this.piece(pos);
+	      this.removePiece(passantPawn);
 	    }
 	  }
 	  if (piece.toString() === "king" && endPos[1] - startPos[1] === 2) {
@@ -675,7 +683,7 @@
 	    this.board.blackPieces.push(this);
 	  }
 	  this.pos = attrs.pos;
-	  this.value = 90;
+	  this.value = 80;
 	  this.moves = Sliding.moves.bind(this);
 	  this.board.setPiece(this);
 	}
@@ -699,7 +707,7 @@
 	  this.moves = Stepping.moves.bind(this);
 	  this.board.setPiece(this);
 	  this.moved = false;
-	  this.value = 10000;
+	  this.value = 100;
 	}
 	Utils.inherits(King, Piece);
 	King.prototype.getMoveDirs = function () {
@@ -857,8 +865,7 @@
 	    Utils = __webpack_require__(4);
 	
 	// Problems:
-	// 1. With queen in danger prefers to put you in check than move it.
-	// 2. Takes too long
+	// 1. With queen in danger prefers to put you in check than move it.a
 	
 	
 	var AI = function (board, color) {
@@ -866,11 +873,9 @@
 	  this.color = color;
 	  this.enemyColor = this.color === "white" ? "black" : "white";
 	  this.moveNumber = 0;
-	  this.iterations = 0;
-	  this.totalGenerated = 0;
 	}
 	
-	AI.prototype.setDepth = function () {
+	AI.prototype.setDepth = function () {  // Still breaks occasionally at depth 4, sticking with 3 for now
 	  var cap = this.capturablePieces();
 	  var moves = this.moveTree.getAllMoves(this.board.pieces(this.color));
 	  if (moves.length < 30) {
@@ -886,24 +891,22 @@
 	      this.depth = allPawns ? 3 : 4;
 	    }
 	  } else { this.depth = 3; }
-	  console.log("Depth: " + this.depth + "  Moves: " + moves.length);
 	}
 	
 	AI.prototype.getMove = function () {
 	  this.moveNumber += 2;
-	  this.iterations = 0;
-	  this.pruned = 0;
 	  if (this.moveNumber < 5) { return this.getOpeningMove(); }
-	  this.moveTree = new BoardNode(this.board, this.color, null, -11000, 11000, 11000);
+	  this.moveTree = new BoardNode(this.board, this.color, null, -500, 500, 500);
 	  this.moveTree.boardValue = this.moveTree.score();
-	  this.setDepth();
-	  this.alphaBeta(this.moveTree, this.depth, -11000, 11000, false);
+	  // this.setDepth();  // Needs to be 3 to guarantee no crashes
+	  this.depth = 3;
+	  this.alphaBeta(this.moveTree, this.depth, -500, 500, false);
 	  var best = this.findBestMove();
 	  delete this.bestNode;
 	  return best;
 	}
 	
-	AI.prototype.getOpeningMove = function () {
+	AI.prototype.getOpeningMove = function () {  // Hard coded 2 opening moves
 	  if (this.moveNumber === 2) {
 	    return [[1,4],[2,4]];
 	  }
@@ -916,16 +919,15 @@
 	  }
 	}
 	
-	AI.prototype.alphaBeta = function (node, depth, a, b, max) {
+	AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic happens
 	  node.a = a;
 	  node.b = b;
-	  this.iterations += 1;
 	  if (depth === 0) {
 	    node.boardValue = node.score();
 	    return node.boardValue;
 	  }
 	  if (max) {
-	    node.boardValue = -11000;
+	    node.boardValue = -500;
 	    var child;
 	    var children = node.generateChildren();
 	    for (var i = 0; i < children.length; i++) {
@@ -933,14 +935,13 @@
 	      node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, false));
 	      node.a = Math.max(node.a, child.boardValue);
 	      if (node.a > node.b) {
-	        this.pruned +=1;
 	        break;
 	       }
 	    }
 	    node.parent && (node.parent.b = Math.min(node.parent.b, node.a));
 	    return node.boardValue;
 	  } else {
-	    node.boardValue = 11000;
+	    node.boardValue = 500;
 	    var child;
 	    var children = node.generateChildren();
 	    for (var i = 0; i < children.length; i++) {
@@ -948,7 +949,6 @@
 	      node.boardValue = Math.min(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, true));
 	      node.b = Math.min(node.b, child.boardValue);
 	      if (node.a > node.b) {
-	        this.pruned +=1;
 	        break;
 	      }
 	    }
@@ -957,11 +957,14 @@
 	  }
 	}
 	
-	AI.prototype.findBestMove = function () {
-	  var c = this.moveTree.children;
-	  var bestNode;
+	AI.prototype.findBestMove = function () {  // Examines next possible moves from tree
+	  var c = this.moveTree.children;           // chooses the one with the min value
+	  var bestNode, node, piece, move;
 	  for (var j = 0; j < c.length; j++) {
-	    if (!bestNode || c[j].boardValue < bestNode.boardValue) {
+	    node = c[j];
+	    piece = this.board.piece(node.move.startPos);
+	    move = node.move.endPos;
+	    if ((!bestNode || c[j].boardValue < bestNode.boardValue) && piece.validMove(move)) {
 	      bestNode = c[j];
 	    }
 	  }
@@ -1039,7 +1042,6 @@
 	}
 	
 	BoardNode.prototype.addChild = function (board, color, move, order) {
-	  window.g.cpuPlayer.totalGenerated += 1;
 	  var bv = color === "white" ? this.b : this.a;
 	  var childNode = new BoardNode(board, color, this, this.a, this.b, bv);
 	  childNode.move = move;
@@ -1048,8 +1050,8 @@
 	  return childNode;
 	}
 	
-	BoardNode.prototype.generateChildren = function () {
-	  var curColor = this.currentTurn;
+	BoardNode.prototype.generateChildren = function () {  // For a given board node, generates and returns
+	  var curColor = this.currentTurn;                       // a child node for every possible move
 	  var nextColor = curColor === "white" ? "black" : "white";
 	  var moves = this.getAllMoves(this.board.pieces(curColor));
 	  var testboard, move, childNode;
