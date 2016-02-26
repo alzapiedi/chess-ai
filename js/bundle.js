@@ -45,7 +45,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Display = __webpack_require__(1),
-	    AI = __webpack_require__(7);
+	    AI = __webpack_require__(7),
+	    Utils = __webpack_require__(4);
 	
 	var Game = function () {
 	  var $el = $('#game');
@@ -155,6 +156,9 @@
 	    this.chooseMove();
 	  } else if (this.board.inCheck(piece.color) && piece.moveIntoCheck(pos)) {
 	    this.display.flashError("You are in check");
+	    this.display.unselect();
+	    this.chooseMove();
+	  } else if (Utils.arrayEquals(this.startPos, pos)) {
 	    this.display.unselect();
 	    this.chooseMove();
 	  } else {

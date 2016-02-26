@@ -1,5 +1,6 @@
 var Display = require('./display'),
-    AI = require('./ai');
+    AI = require('./ai'),
+    Utils = require('./utils');
 
 var Game = function () {
   var $el = $('#game');
@@ -109,6 +110,9 @@ Game.prototype.setEnd = function (pos) {
     this.chooseMove();
   } else if (this.board.inCheck(piece.color) && piece.moveIntoCheck(pos)) {
     this.display.flashError("You are in check");
+    this.display.unselect();
+    this.chooseMove();
+  } else if (Utils.arrayEquals(this.startPos, pos)) {
     this.display.unselect();
     this.chooseMove();
   } else {

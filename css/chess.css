@@ -45,8 +45,8 @@ body {
 }
 
 #game {
-  width: 480px;
-  height: 480px;
+  width: 490px;
+  height: 490px;
   margin: auto;
   border: 5px solid #eee;
   border-style: ridge;
