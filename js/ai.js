@@ -75,12 +75,12 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic
       } else {
         node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, false));
       }
-      node.a = Math.max(node.a, child.boardValue);
       if (node.a > node.b) {
         break;
        }
+      node.a = Math.max(node.a, child.boardValue);
     }
-    node.parent && (node.parent.b = Math.min(node.parent.b, node.a));
+    node.parent && node.a < node.b && (node.parent.b = Math.min(node.parent.b, node.a));
     return node.boardValue;
   } else {
     node.boardValue = 500;
@@ -98,7 +98,7 @@ AI.prototype.alphaBeta = function (node, depth, a, b, max) {  // Where the magic
         break;
       }
     }
-    node.parent && (node.parent.a = Math.max(node.parent.a, node.b));
+    node.parent && node.a < node.b && (node.parent.a = Math.max(node.parent.a, node.b));
     return node.boardValue;
   }
 }

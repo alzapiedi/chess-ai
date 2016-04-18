@@ -746,6 +746,7 @@
 	Utils.inherits(King, Piece);
 	King.prototype.getMoveDirs = function () {
 	  var deltas = Piece.CARDINALS.concat(Piece.DIAGONALS);
+	  // var check = this.board.inCheck(this.color);
 	  var clearLeft = (!this.board.isOccupied([this.pos[0], this.pos[1] - 1]) &&
 	                    !this.board.isOccupied([this.pos[0], this.pos[1] - 2]) &&
 	                    !this.board.isOccupied([this.pos[0], this.pos[1] - 3]));
@@ -972,12 +973,12 @@
 	      } else {
 	        node.boardValue = Math.max(node.boardValue, this.alphaBeta(child, depth - 1, node.a, node.b, false));
 	      }
-	      node.a = Math.max(node.a, child.boardValue);
 	      if (node.a > node.b) {
 	        break;
 	       }
+	      node.a = Math.max(node.a, child.boardValue);
 	    }
-	    node.parent && (node.parent.b = Math.min(node.parent.b, node.a));
+	    node.parent && node.a < node.b && (node.parent.b = Math.min(node.parent.b, node.a));
 	    return node.boardValue;
 	  } else {
 	    node.boardValue = 500;
@@ -995,7 +996,7 @@
 	        break;
 	      }
 	    }
-	    node.parent && (node.parent.a = Math.max(node.parent.a, node.b));
+	    node.parent && node.a < node.b && (node.parent.a = Math.max(node.parent.a, node.b));
 	    return node.boardValue;
 	  }
 	}

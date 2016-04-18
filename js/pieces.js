@@ -219,6 +219,7 @@ var King = function (attrs) {
 Utils.inherits(King, Piece);
 King.prototype.getMoveDirs = function () {
   var deltas = Piece.CARDINALS.concat(Piece.DIAGONALS);
+  // var check = this.board.inCheck(this.color);
   var clearLeft = (!this.board.isOccupied([this.pos[0], this.pos[1] - 1]) &&
                     !this.board.isOccupied([this.pos[0], this.pos[1] - 2]) &&
                     !this.board.isOccupied([this.pos[0], this.pos[1] - 3]));
